@@ -4,7 +4,7 @@ const ARTICLES_DATA = [
     "title": "How Does Europe Depend on the U.S. — and Why",
     "category": "Politics",
     "dateline": "BRUSSELS",
-    "byline": "Kharytonov Boryslav and Amila Kiata",
+    "byline": "Kharytonov Boryslav and Amila Kyatova",
     "date": "2026-08-20",
     "readTime": "8 min read",
     "dek": "From fighter jets and microchips to the gas that heats European homes, the continent's reliance on the United States runs deeper than most defence budgets suggest — and history shows that even close allies have used that leverage before.",
