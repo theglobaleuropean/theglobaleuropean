@@ -75,6 +75,7 @@
         <input type="email" id="newsletterEmail" placeholder="you@email.com" required>
         <button type="submit">Subscribe</button>
       </form>
+      <p class="newsletter-hint">Subscriptions are handled via our <a href="https://theglobaleuropean.substack.com" target="_blank" rel="noopener noreferrer">Substack</a>.</p>
       <p class="newsletter-error" id="newsletterError"></p>
     </div>
   </div>
@@ -87,6 +88,12 @@
       <div>
         <div class="footer-brand"><span class="brand-badge" id="logoFooter"></span></div>
         <p class="footer-desc">Independent coverage of European politics, economy and the forces shaping the continent's future.</p>
+        <div class="social-links">
+          <a href="https://www.instagram.com/theglobaleuropean?igsi=OWJyZGZ6MjlnZWFn&amp;utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg class="ig-icon" viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle class="ig-dot" cx="17.3" cy="6.7" r="1.1"/></svg></a>
+          <a href="https://www.tiktok.com/@theglobal.european?_r=1&amp;_t=ZN-99GFnD6DvXS" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M16.6 5.82a4.28 4.28 0 0 1-3-3.82h-3.4v13.6a2.6 2.6 0 1 1-2.6-2.6c.28 0 .55.04.8.1V9.6a6 6 0 1 0 5.2 5.95V9.4a7.66 7.66 0 0 0 4.6 1.5V7.5a4.26 4.26 0 0 1-1.6-1.68Z"/></svg></a>
+          <a href="https://substack.com/@theglobaleuropean" target="_blank" rel="noopener noreferrer" aria-label="Substack"><svg viewBox="0 0 24 24"><path d="M4 3h16v3H4V3Zm0 5h16v3H4V8Zm0 5h16v8l-8-4-8 4v-8Z"/></svg></a>
+          <a href="https://x.com/thegleuropean?s=11" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7.6 8.7L23 22h-6.6l-5.2-6.8L5.2 22H2l8.1-9.3L1.5 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.4 4h-2l12.3 16Z"/></svg></a>
+        </div>
       </div>
       <div class="footer-col">
         <h4>Sections</h4>
@@ -139,7 +146,9 @@
       return false;
     }
     errorEl.classList.remove('show');
-    form.querySelector('button').textContent = 'Subscribed';
+    const email = encodeURIComponent(input.value.trim());
+    window.open(`https://theglobaleuropean.substack.com/subscribe?email=${email}`, '_blank', 'noopener,noreferrer');
+    form.querySelector('button').textContent = 'Check Substack →';
     input.disabled = true;
     return false;
   }

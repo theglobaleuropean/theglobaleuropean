@@ -133,6 +133,8 @@
   .newsletter-form input::placeholder{color:currentColor; opacity:.55;}
   .newsletter-form button{background:var(--gold); color:var(--navy-deep); border:none; padding:0 22px; font-weight:700; font-size:13px; letter-spacing:.03em; text-transform:uppercase; cursor:pointer;}
   .newsletter-form button:hover{background:var(--gold-deep);}
+  .newsletter-hint{font-size:11.5px; opacity:.6; margin-top:8px;}
+  .newsletter-hint a{text-decoration:underline; text-decoration-color:currentColor;}
   .newsletter-error{display:none; font-size:12.5px; margin-top:10px; color:#FF9E8A;}
   .newsletter-error.show{display:block;}
   html[data-theme="dark"] .newsletter-error{color:#B3402E;}
@@ -152,6 +154,12 @@
   .footer-brand .brand-rule{height:2px; margin-top:5px;}
   .footer-brand .brand-rule::after{width:5px; height:5px; right:-5px;}
   .footer-desc{font-size:13px; line-height:1.6; max-width:32ch;}
+  .social-links{display:flex; gap:12px; margin-top:18px;}
+  .social-links a{width:34px; height:34px; border-radius:50%; border:1px solid rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; color:#B9C3D9;}
+  .social-links a:hover{border-color:var(--gold); color:var(--gold);}
+  .social-links svg{width:16px; height:16px; fill:currentColor;}
+  .social-links svg.ig-icon{fill:none; stroke:currentColor;}
+  .social-links svg.ig-icon .ig-dot{fill:currentColor; stroke:none;}
   .footer-col h4{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#7E8CA6; margin-bottom:14px;}
   .footer-col a{display:block; font-size:13.5px; padding:6px 0; color:#B9C3D9;}
   .footer-col a:hover{color:var(--gold);}
