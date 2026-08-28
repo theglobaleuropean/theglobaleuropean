@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — The Global European</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="articles.js"></script>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <h2>Admin</h2>
+    <p>Enter the admin password to manage articles.</p>
+    <input type="text" id="pwInput" placeholder="Password" autocomplete="off">
+    <div class="err" id="pwErr">Incorrect password.</div>
+    <button class="btn btn-primary" style="width:100%;" onclick="tryLogin()">Enter</button>
+  </div>
+</div>
+
+<div id="adminApp" style="display:none;">
+<div class="wrap-admin">
+  <div class="admin-header">
+    <h1>Manage articles</h1>
+    <a class="back-link" style="margin-top:0;" href="index.html">← Back to site</a>
+  </div>
+  <p class="lede">Add, edit and unpublish your dispatches — no code required.</p>
+
+  <div class="note">
+    <b>How publishing works on this site.</b> The site is now real separate files: <code>index.html</code>, one HTML file per article under <code>/articles/</code>, and <code>articles.js</code> that <code>index.html</code> reads to build the homepage. This page lets you edit that content and download the files that changed.
+    <ol>
+      <li>Add or edit articles below.</li>
+      <li>Click <b>Export updated files</b> — it downloads a .zip containing the updated <code>articles.js</code> and a fresh HTML file for every article.</li>
+      <li>Upload those files to your host, in the same folder structure (<code>articles.js</code> at the root, each article inside <code>/articles/</code>) — overwrite what's there.</li>
+    </ol>
+    Deleted articles won't remove their old file from your host automatically — delete that file manually after uploading if you unpublish something.
+  </div>
+
+  <fieldset>
+    <legend id="formLegend">New article</legend>
+    <label>Title</label>
+    <input type="text" id="f-title" placeholder="Headline">
+    <div class="row3">
+      <div><label>Category</label>
+        <select id="f-category"><option>Politics</option><option>Economy</option><option>Future</option></select>
+      </div>
+      <div><label>Dateline (city)</label><input type="text" id="f-dateline" placeholder="BRUSSELS"></div>
+      <div><label>Date</label><input type="date" id="f-date"></div>
+    </div>
+    <div class="row">
+      <div><label>Byline</label><input type="text" id="f-byline" placeholder="Your name"></div>
+      <div><label>Read time</label><input type="text" id="f-readtime" placeholder="auto-calculated, or set your own"></div>
+    </div>
+    <label>Dek (one or two sentence summary, shown on the homepage)</label>
+    <textarea id="f-dek" style="min-height:70px; font-family:'Inter',sans-serif; font-size:14px;"></textarea>
+    <label>Body</label>
+    <textarea id="f-body" placeholder="Full article text. Leave a blank line between paragraphs. Use [link text](https://...) for inline source links."></textarea>
+    <p class="hint">Separate paragraphs with a blank line. For clickable source links, write <code>[link text](https://example.com)</code> — it'll render as a real hyperlink on the page.</p>
+    <div class="check-row"><input type="checkbox" id="f-featured"><label for="f-featured">Show as the featured story on the homepage</label></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="saveArticle()">Save article</button>
+      <button class="btn btn-ghost" onclick="resetForm()">Clear form</button>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Published (working copy, this browser)</legend>
+    <div id="articleList"></div>
+    <div class="actions">
+      <button class="btn btn-gold" onclick="exportSite()">↓ Export updated files (.zip)</button>
+      <button class="btn btn-ghost" onclick="reloadFromServer()">Reload from live site</button>
+    </div>
+  </fieldset>
+</div>
+</div>
+
+<script src="logo.js"></script>
+<script>
+  const ADMIN_PASSWORD = "changeme123"; // change this before you rely on it for anything more than keeping out casual visitors
+  function tryLogin(){
+    const val = document.getElementById('pwInput').value;
+    if(val === ADMIN_PASSWORD){
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('adminApp').style.display = 'block';
+      init();
+    } else {
+      document.getElementById('pwErr').style.display = 'block';
+    }
+  }
+  document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key === 'Enter') tryLogin(); });
+
+  let articles = [];
+  let editingId = null;
+  const DRAFT_KEY = 'tge-admin-draft';
+
+  function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function linkify(escapedText){
+    return escapedText.replace(/\[([^\[\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      (m, label, url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`);
+  }
+  const boltSvg = '<svg class="bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6Z"/></svg>';
+  const WATERMARK_BLOCK = `<svg width="0" height="0" style="position:absolute;" aria-hidden="true"><symbol id="tge-star" viewBox="0 0 24 24"><polygon points="19.07,4.93 15.77,11.40 20.91,16.54 13.73,15.40 10.44,21.88 9.30,14.70 2.12,13.56 8.60,10.27 7.46,3.09 12.60,8.23"/></symbol></svg>
+
+<svg class="page-watermark" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#tge-star" width="24" height="24" opacity="0.73" transform="translate(180.8,41.0) scale(1.069) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.62" transform="translate(266.6,21.9) scale(0.731) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.56" transform="translate(334.6,23.7) scale(0.542) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.55" transform="translate(366.4,45.9) scale(0.500) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.56" transform="translate(353.7,82.6) scale(0.542) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.62" transform="translate(299.8,124.0) scale(0.731) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.73" transform="translate(219.2,159.0) scale(1.069) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.86" transform="translate(133.4,178.1) scale(1.463) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.96" transform="translate(65.4,176.3) scale(1.779) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="1.00" transform="translate(33.6,154.1) scale(1.900) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.96" transform="translate(46.3,117.4) scale(1.779) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.86" transform="translate(100.2,76.0) scale(1.463) translate(-12,-12)"/></svg>`;
+
+  function generateArticleHtml(a){
+    const paras = a.body.split('\n\n').map(p => `<p>${linkify(esc(p))}</p>`).join('');
+    return `<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${esc(a.title)} — The Global European</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;0,9..144,700;1,9..144,450&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+${WATERMARK_BLOCK}
+
+<header>
+  <div class="header-inner">
+    <a class="brand" href="../index.html"><span class="brand-badge" id="logoHeader"></span></a>
+    <nav>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#politics">Politics</a>
+        <a href="../index.html#economy">Economy</a>
+        <a href="../index.html#future">The Future</a>
+      </div>
+    </nav>
+    <div class="header-tools">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.7A8.5 8.5 0 1 1 9.3 4a7 7 0 0 0 10.7 10.7Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap-narrow">
+  <span class="eyebrow article-eyebrow">${boltSvg}${esc(a.category)}</span>
+  <h1 class="article-h1">${esc(a.title)}</h1>
+  <p class="article-dek">${esc(a.dek)}</p>
+  <div class="byline article-byline"><b>${esc(a.byline)}</b><span>${esc(a.dateline)} —</span><span>${esc(a.readTime)}</span><span>${esc(a.date)}</span></div>
+  <div class="article-body">${paras}</div>
+  <a class="back-link" href="../index.html">← All dispatches</a>
+</main>
+
+<div class="star-ribbon" id="starRibbon" aria-hidden="true"></div>
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><span class="brand-badge" id="logoFooter"></span></div>
+        <p class="footer-desc">Independent coverage of European politics, economy and the forces shaping the continent's future.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Sections</h4>
+        <a href="../index.html#politics">Politics</a>
+        <a href="../index.html#economy">Economy</a>
+        <a href="../index.html#future">The Future</a>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <a href="../about.html">About Us</a>
+        <a href="#">Editorial Standards</a>
+        <a href="../contacts.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Manage</h4>
+        <a href="../admin.html" class="admin-link">Admin — Add Article</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 The Global European. All rights reserved.</span>
+      <span>Made in Europe, for Europe.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../logo.js"><\/script>
+<script>
+  const root = document.documentElement;
+  const savedTheme = localStorage.getItem('tge-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', savedTheme || (prefersDark ? 'dark' : 'light'));
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('tge-theme', next);
+  });
+  document.getElementById('logoHeader').innerHTML = LOGO_MARK_HTML;
+  document.getElementById('logoFooter').innerHTML = LOGO_MARK_HTML;
+  function renderStarRibbon(){
+    const el = document.getElementById('starRibbon');
+    if(!el) return;
+    const count = Math.max(18, Math.ceil(window.innerWidth / 34));
+    let icons = '';
+    for(let i = 0; i < count; i++){ icons += '<svg class="tge-star-icon"><use href="#tge-star"/></svg>'; }
+    el.innerHTML = icons;
+  }
+  window.addEventListener('resize', () => { clearTimeout(window._tgeStarTO); window._tgeStarTO = setTimeout(renderStarRibbon, 150); });
+  renderStarRibbon();
+<\/script>
+
+</body>
+</html>`;
+  }
+
+  function slugify(title){
+    let base = title.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'article';
+    let id = base, n = 2;
+    while(articles.some(a => a.id === id && a.id !== editingId)){ id = base + '-' + n; n++; }
+    return id;
+  }
+  function wordsReadTime(text){
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200)) + ' min read';
+  }
+  function persistDraft(){ localStorage.setItem(DRAFT_KEY, JSON.stringify(articles)); }
+
+  function renderList(){
+    const el = document.getElementById('articleList');
+    if(!articles.length){ el.innerHTML = '<p class="empty">No articles yet — use the form above to add your first one.</p>'; return; }
+    const sorted = [...articles].sort((a,b) => new Date(b.date) - new Date(a.date));
+    el.innerHTML = sorted.map(a => `
+      <div class="list-item">
+        <div>
+          <div class="li-title">${esc(a.title)}</div>
+          <div class="li-meta">${esc(a.category)} · ${esc(a.dateline)} · ${esc(a.date)} ${a.featured ? '· <span class="featured-tag">Featured</span>' : ''} · <span style="opacity:.7;">articles/${esc(a.id)}.html</span></div>
+        </div>
+        <div class="li-buttons">
+          <button onclick="editArticle('${a.id}')">Edit</button>
+          <button class="del" onclick="deleteArticle('${a.id}')">Delete</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function resetForm(){
+    editingId = null;
+    document.getElementById('formLegend').textContent = 'New article';
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-category').value = 'Politics';
+    document.getElementById('f-dateline').value = '';
+    document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+    document.getElementById('f-byline').value = '';
+    document.getElementById('f-readtime').value = '';
+    document.getElementById('f-dek').value = '';
+    document.getElementById('f-body').value = '';
+    document.getElementById('f-featured').checked = false;
+  }
+
+  function saveArticle(){
+    const title = document.getElementById('f-title').value.trim();
+    const body = document.getElementById('f-body').value.trim();
+    if(!title || !body){ alert('Title and body are required.'); return; }
+    const featured = document.getElementById('f-featured').checked;
+    const readtimeInput = document.getElementById('f-readtime').value.trim();
+    const data = {
+      id: editingId || slugify(title),
+      title,
+      category: document.getElementById('f-category').value,
+      dateline: document.getElementById('f-dateline').value.trim().toUpperCase() || 'EUROPE',
+      byline: document.getElementById('f-byline').value.trim() || 'The Editorial Team',
+      date: document.getElementById('f-date').value || new Date().toISOString().slice(0,10),
+      readTime: readtimeInput || wordsReadTime(body),
+      dek: document.getElementById('f-dek').value.trim(),
+      body,
+      featured
+    };
+    if(featured){ articles.forEach(a => a.featured = false); }
+    if(editingId){
+      const idx = articles.findIndex(a => a.id === editingId);
+      if(idx > -1) articles[idx] = data;
+    } else {
+      articles.push(data);
+    }
+    persistDraft();
+    renderList();
+    resetForm();
+  }
+
+  function editArticle(id){
+    const a = articles.find(x => x.id === id);
+    if(!a) return;
+    editingId = id;
+    document.getElementById('formLegend').textContent = 'Editing: ' + a.title;
+    document.getElementById('f-title').value = a.title;
+    document.getElementById('f-category').value = a.category;
+    document.getElementById('f-dateline').value = a.dateline;
+    document.getElementById('f-date').value = a.date;
+    document.getElementById('f-byline').value = a.byline;
+    document.getElementById('f-readtime').value = a.readTime;
+    document.getElementById('f-dek').value = a.dek;
+    document.getElementById('f-body').value = a.body;
+    document.getElementById('f-featured').checked = !!a.featured;
+    window.scrollTo({top: 0, behavior:'smooth'});
+  }
+
+  function deleteArticle(id){
+    if(!confirm('Delete this article from the working copy? (Remember to also delete its old .html file on your host after uploading.)')) return;
+    articles = articles.filter(a => a.id !== id);
+    persistDraft();
+    renderList();
+  }
+
+  async function exportSite(){
+    if(typeof JSZip === 'undefined'){ alert('Could not load the zip library — check your internet connection and try again.'); return; }
+    const zip = new JSZip();
+    zip.file('articles.js', 'const ARTICLES_DATA = ' + JSON.stringify(articles, null, 2) + ';\n');
+    const folder = zip.folder('articles');
+    articles.forEach(a => folder.file(a.id + '.html', generateArticleHtml(a)));
+    const blob = await zip.generateAsync({type:'blob'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url; link.download = 'tge-site-update.zip';
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function reloadFromServer(){
+    if(!confirm('This replaces your current unsaved drafts with the live articles.js. Continue?')) return;
+    fetchLive();
+  }
+  function fetchLive(){
+    articles = JSON.parse(JSON.stringify(typeof ARTICLES_DATA !== 'undefined' ? ARTICLES_DATA : []));
+    persistDraft();
+    renderList();
+  }
+
+  function init(){
+    resetForm();
+    const draft = localStorage.getItem(DRAFT_KEY);
+    if(draft){
+      try{ articles = JSON.parse(draft); renderList(); }
+      catch(e){ fetchLive(); }
+    } else {
+      fetchLive();
+    }
+  }
+</script>
+
+</body>
+</html>

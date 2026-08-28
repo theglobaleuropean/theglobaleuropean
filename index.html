@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Global European — Europe, Politics, Economy, Future</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;0,9..144,700;1,9..144,450&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute;" aria-hidden="true"><symbol id="tge-star" viewBox="0 0 24 24"><polygon points="19.07,4.93 15.77,11.40 20.91,16.54 13.73,15.40 10.44,21.88 9.30,14.70 2.12,13.56 8.60,10.27 7.46,3.09 12.60,8.23"/></symbol></svg>
+
+<svg class="page-watermark" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#tge-star" width="24" height="24" opacity="0.73" transform="translate(180.8,41.0) scale(1.069) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.62" transform="translate(266.6,21.9) scale(0.731) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.56" transform="translate(334.6,23.7) scale(0.542) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.55" transform="translate(366.4,45.9) scale(0.500) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.56" transform="translate(353.7,82.6) scale(0.542) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.62" transform="translate(299.8,124.0) scale(0.731) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.73" transform="translate(219.2,159.0) scale(1.069) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.86" transform="translate(133.4,178.1) scale(1.463) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.96" transform="translate(65.4,176.3) scale(1.779) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="1.00" transform="translate(33.6,154.1) scale(1.900) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.96" transform="translate(46.3,117.4) scale(1.779) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.86" transform="translate(100.2,76.0) scale(1.463) translate(-12,-12)"/></svg>
+
+<header>
+  <div class="header-inner">
+    <a class="brand" href="index.html"><span class="brand-badge" id="logoHeader"></span></a>
+    <nav>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#politics">Politics</a>
+        <a href="index.html#economy">Economy</a>
+        <a href="index.html#future">The Future</a>
+      </div>
+    </nav>
+    <div class="header-tools">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.7A8.5 8.5 0 1 1 9.3 4a7 7 0 0 0 10.7 10.7Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="ticker-bar" id="tickerBar" role="marquee" aria-label="Latest headlines">
+  <div class="live-tag"><span class="live-dot"></span>Live wire</div>
+  <div class="ticker-viewport"><div class="ticker-track" id="tickerTrack"></div></div>
+</div>
+
+<main>
+  <section class="hero">
+    <div class="wrap" id="heroSection"></div>
+  </section>
+  <section class="section" id="politics">
+    <div class="wrap">
+      <div class="section-head"><h2><span class="dot"></span>Politics</h2></div>
+      <div class="card-grid" id="grid-Politics"></div>
+    </div>
+  </section>
+  <section class="section" id="economy">
+    <div class="wrap">
+      <div class="section-head"><h2><span class="dot"></span>Economy</h2></div>
+      <div class="card-grid" id="grid-Economy"></div>
+    </div>
+  </section>
+  <section class="section" id="future">
+    <div class="wrap">
+      <div class="section-head"><h2><span class="dot"></span>The Future</h2></div>
+      <div class="card-grid" id="grid-Future"></div>
+    </div>
+  </section>
+</main>
+
+<section class="newsletter" id="newsletterSection">
+  <div class="wrap newsletter-inner">
+    <div>
+      <h2>The morning brief, from Brussels to your inbox</h2>
+      <p>One dispatch a day. Politics, economy and the long view on Europe's future — no noise.</p>
+    </div>
+    <div class="newsletter-form-wrap">
+      <form class="newsletter-form" novalidate onsubmit="return handleNewsletterSubmit(event)">
+        <input type="email" id="newsletterEmail" placeholder="you@email.com" required>
+        <button type="submit">Subscribe</button>
+      </form>
+      <p class="newsletter-error" id="newsletterError"></p>
+    </div>
+  </div>
+</section>
+
+<div class="star-ribbon" id="starRibbon" aria-hidden="true"></div>
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><span class="brand-badge" id="logoFooter"></span></div>
+        <p class="footer-desc">Independent coverage of European politics, economy and the forces shaping the continent's future.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Sections</h4>
+        <a href="index.html#politics">Politics</a>
+        <a href="index.html#economy">Economy</a>
+        <a href="index.html#future">The Future</a>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <a href="about.html">About Us</a>
+        <a href="#">Editorial Standards</a>
+        <a href="contacts.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Manage</h4>
+        <a href="admin.html" class="admin-link">Admin — Add Article</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 The Global European. All rights reserved.</span>
+      <span>Made in Europe, for Europe.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="logo.js"></script>
+<script src="articles.js"></script>
+<script>
+  const root = document.documentElement;
+  const savedTheme = localStorage.getItem('tge-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', savedTheme || (prefersDark ? 'dark' : 'light'));
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('tge-theme', next);
+  });
+  document.getElementById('logoHeader').innerHTML = LOGO_MARK_HTML;
+  document.getElementById('logoFooter').innerHTML = LOGO_MARK_HTML;
+
+  function handleNewsletterSubmit(e){
+    e.preventDefault();
+    const form = e.target;
+    const input = document.getElementById('newsletterEmail');
+    const errorEl = document.getElementById('newsletterError');
+    if(!input.checkValidity()){
+      errorEl.textContent = input.value.trim() ? 'Please enter a valid email address.' : 'Please enter your email address.';
+      errorEl.classList.add('show');
+      input.focus();
+      return false;
+    }
+    errorEl.classList.remove('show');
+    form.querySelector('button').textContent = 'Subscribed';
+    input.disabled = true;
+    return false;
+  }
+
+  function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  const boltSvg = '<svg class="bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6Z"/></svg>';
+  const CATEGORIES = ['Politics','Economy','Future'];
+
+  function renderHero(article){
+    const hero = document.getElementById('heroSection');
+    if(!article){
+      hero.innerHTML = `<div class="empty-state" style="border:none; text-align:left; padding:0;">
+        <span>No dispatches yet</span>
+        <p style="margin-top:8px; font-size:16px;">Head to the <a href="admin.html" style="text-decoration:underline; text-decoration-color:var(--gold);">admin page</a> to publish the first one.</p>
+      </div>`;
+      return;
+    }
+    hero.innerHTML = `
+      <div class="hero-grid">
+        <span class="eyebrow">${boltSvg}${esc(article.category)}</span>
+        <h1><a href="articles/${article.id}.html">${esc(article.title)}</a></h1>
+        <p class="dek">${esc(article.dek)}</p>
+        <div class="byline"><b>${esc(article.byline)}</b><span>${esc(article.dateline)} —</span><span>${esc(article.readTime)}</span><span>${esc(article.date)}</span></div>
+        <a class="back-link" style="margin-top:0;" href="articles/${article.id}.html">Read the full dispatch →</a>
+      </div>`;
+  }
+
+  function renderCard(article){
+    return `<article class="card">
+      <span class="eyebrow">${boltSvg}${esc(article.dateline)}</span>
+      <h3><a href="articles/${article.id}.html">${esc(article.title)}</a></h3>
+      <p>${esc(article.dek)}</p>
+      <div class="byline">${esc(article.byline)} · ${esc(article.readTime)}</div>
+    </article>`;
+  }
+  function emptyStateFor(category){
+    return `<div class="empty-state"><span>No dispatches yet</span><p>Nothing published in ${category} — check back soon.</p></div>`;
+  }
+
+  function renderStarRibbon(){
+    const el = document.getElementById('starRibbon');
+    if(!el) return;
+    const count = Math.max(18, Math.ceil(window.innerWidth / 34));
+    let icons = '';
+    for(let i = 0; i < count; i++){ icons += '<svg class="tge-star-icon"><use href="#tge-star"/></svg>'; }
+    el.innerHTML = icons;
+  }
+  window.addEventListener('resize', () => { clearTimeout(window._tgeStarTO); window._tgeStarTO = setTimeout(renderStarRibbon, 150); });
+  renderStarRibbon();
+
+  (function(){
+    const articles = (typeof ARTICLES_DATA !== 'undefined' ? ARTICLES_DATA : []).slice();
+    articles.sort((a,b) => new Date(b.date) - new Date(a.date));
+    const featured = articles.find(a => a.featured) || articles[0];
+    renderHero(featured);
+    CATEGORIES.forEach(cat => {
+      const grid = document.getElementById('grid-' + cat);
+      const items = articles.filter(a => a.category === cat);
+      grid.innerHTML = items.length ? items.map(renderCard).join('') : emptyStateFor(cat);
+    });
+    const track = document.getElementById('tickerTrack');
+    const items = articles.map(a => `<span class="ticker-item"><span class="t-time">${esc(a.dateline)}</span><span>${esc(a.title)}</span></span>`).join('');
+    track.innerHTML = items ? (items + items) : `<span class="ticker-item">No dispatches yet — publish one from the admin page</span>`;
+  })();
+</script>
+
+</body>
+</html>
