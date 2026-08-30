@@ -56,8 +56,9 @@
   .ticker-track{position:absolute; top:0; left:0; display:flex; align-items:center; height:100%; gap:52px; padding-left:24px; white-space:nowrap; animation:scroll 38s linear infinite;}
   .ticker-bar:hover .ticker-track{animation-play-state:paused;}
   @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
-  .ticker-item{font-family:'IBM Plex Mono',monospace; font-size:12.5px; display:inline-flex; gap:10px; align-items:center;}
+  .ticker-item{font-family:'IBM Plex Mono',monospace; font-size:12.5px; display:inline-flex; gap:10px; align-items:center; cursor:pointer;}
   .ticker-item .t-time{opacity:.65;}
+  .ticker-item:hover{text-decoration:underline; text-decoration-color:var(--gold);}
   @media (prefers-reduced-motion: reduce){ .ticker-track{animation:none; position:static; padding:9px 18px;} .live-dot{animation:none;} }
 
   /* Hero */

@@ -212,7 +212,7 @@
       grid.innerHTML = items.length ? items.map(renderCard).join('') : emptyStateFor(cat);
     });
     const track = document.getElementById('tickerTrack');
-    const items = articles.map(a => `<span class="ticker-item"><span class="t-time">${esc(a.dateline)}</span><span>${esc(a.title)}</span></span>`).join('');
+    const items = articles.map(a => `<a class="ticker-item" href="articles/${a.id}.html"><span class="t-time">${esc(a.dateline)}</span><span>${esc(a.title)}</span></a>`).join('');
     track.innerHTML = items ? (items + items) : `<span class="ticker-item">No dispatches yet — publish one from the admin page</span>`;
   })();
 </script>
