@@ -62,7 +62,7 @@
     <textarea id="f-dek" style="min-height:70px; font-family:'Inter',sans-serif; font-size:14px;"></textarea>
     <label>Body</label>
     <textarea id="f-body" placeholder="Full article text. Leave a blank line between paragraphs. Use [link text](https://...) for inline source links."></textarea>
-    <p class="hint">Separate paragraphs with a blank line. For clickable source links, write <code>[link text](https://example.com)</code> — it'll render as a real hyperlink on the page.</p>
+    <p class="hint">Separate paragraphs with a blank line. For clickable source links, write <code>[link text](https://example.com)</code> — it'll render as a real hyperlink on the page. Start a paragraph with <code>## </code> to make it a section heading — articles with two or more headings automatically get an on-page table of contents.</p>
     <div class="check-row"><input type="checkbox" id="f-featured"><label for="f-featured">Show as the featured story on the homepage</label></div>
     <div class="actions">
       <button class="btn btn-primary" onclick="saveArticle()">Save article</button>
@@ -111,7 +111,15 @@
 <svg class="page-watermark" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#tge-star" width="24" height="24" opacity="0.73" transform="translate(180.8,41.0) scale(1.069) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.62" transform="translate(266.6,21.9) scale(0.731) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.56" transform="translate(334.6,23.7) scale(0.542) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.55" transform="translate(366.4,45.9) scale(0.500) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.56" transform="translate(353.7,82.6) scale(0.542) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.62" transform="translate(299.8,124.0) scale(0.731) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.73" transform="translate(219.2,159.0) scale(1.069) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.86" transform="translate(133.4,178.1) scale(1.463) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.96" transform="translate(65.4,176.3) scale(1.779) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="1.00" transform="translate(33.6,154.1) scale(1.900) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.96" transform="translate(46.3,117.4) scale(1.779) translate(-12,-12)"/><use href="#tge-star" width="24" height="24" opacity="0.86" transform="translate(100.2,76.0) scale(1.463) translate(-12,-12)"/></svg>`;
 
   function generateArticleHtml(a){
-    const paras = a.body.split('\n\n').map(p => `<p>${linkify(esc(p))}</p>`).join('');
+    const paras = a.body.split('\n\n').map(p => {
+      const trimmed = p.trim();
+      if(trimmed.startsWith('## ')){
+        const text = trimmed.slice(3).trim();
+        const id = text.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'section';
+        return `<h2 id="${esc(id)}">${esc(text)}</h2>`;
+      }
+      return `<p>${linkify(esc(p))}</p>`;
+    }).join('');
     return `<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -149,13 +157,16 @@ ${WATERMARK_BLOCK}
   </div>
 </header>
 
-<main class="wrap-narrow">
+<main class="wrap-article">
+<div class="article-content">
   <span class="eyebrow article-eyebrow">${boltSvg}${esc(a.category)}</span>
   <h1 class="article-h1">${esc(a.title)}</h1>
   <p class="article-dek">${esc(a.dek)}</p>
   <div class="byline article-byline"><b>${esc(a.byline)}</b><span>${esc(a.dateline)} —</span><span>${esc(a.readTime)}</span><span>${esc(a.date)}</span></div>
   <div class="article-body">${paras}</div>
   <a class="back-link" href="../index.html">← All dispatches</a>
+</div>
+<nav class="article-toc" id="articleToc" aria-label="Table of contents"></nav>
 </main>
 
 <div class="star-ribbon" id="starRibbon" aria-hidden="true"></div>
@@ -197,6 +208,7 @@ ${WATERMARK_BLOCK}
 </footer>
 
 <script src="../logo.js"><\/script>
+<script src="../toc.js"><\/script>
 <script>
   const root = document.documentElement;
   const savedTheme = localStorage.getItem('tge-theme');

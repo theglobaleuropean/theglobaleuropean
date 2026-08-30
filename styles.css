@@ -103,6 +103,9 @@
   .empty-state span{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gold-deep); text-transform:uppercase; letter-spacing:.08em;}
 
   /* Article view */
+  .wrap-article{max-width:1040px; margin:0 auto; padding:0 28px; display:grid; grid-template-columns:1fr 220px; gap:56px; align-items:start;}
+  .wrap-article.no-toc{grid-template-columns:1fr;}
+  .wrap-article.no-toc .article-toc{display:none;}
   .article-eyebrow{margin-top:40px;}
   .article-h1{font-family:'Fraunces',serif; font-weight:600; font-size:clamp(28px,4.2vw,44px); line-height:1.1; margin:14px 0 18px; letter-spacing:-.01em;}
   .article-dek{font-size:18px; color:var(--slate); margin-bottom:20px;}
@@ -110,8 +113,18 @@
   .article-body{font-size:17px; line-height:1.8; padding-bottom:70px;}
   .article-body p{margin-bottom:22px;}
   .article-body p:first-of-type::first-letter{font-family:'Fraunces',serif; font-size:60px; font-weight:600; float:left; line-height:.85; padding:6px 8px 0 0; color:var(--navy);}
+  .article-body h2{margin:48px 0 18px; font-family:'Fraunces',serif; font-weight:600; font-size:clamp(24px,3.6vw,32px); line-height:1.18; letter-spacing:-.01em;}
+  .article-body h2:first-child{margin-top:0;}
   .back-link{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); display:inline-block; margin-top:32px;}
   .back-link:hover{color:var(--gold-deep);}
+
+  /* Article table of contents */
+  .article-toc{display:block; position:sticky; top:88px; border-left:2px solid var(--line); padding-left:20px; max-height:calc(100vh - 120px); overflow-y:auto;}
+  .article-toc h4{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--slate); margin-bottom:12px;}
+  .article-toc a{display:block; font-size:13.5px; line-height:1.45; color:var(--slate); padding:7px 0 7px 14px; margin-left:-16px; border-left:2px solid transparent; transition:border-color .15s ease, color .15s ease;}
+  .article-toc a:hover{color:var(--ink);}
+  .article-toc a.active{color:var(--ink); font-weight:600; border-left:2px solid var(--gold);}
+  @media (max-width:980px){ .wrap-article{grid-template-columns:1fr;} .article-toc{display:none;} }
 
   /* Contact page */
   .contact-grid{display:grid; grid-template-columns:1fr; max-width:360px; gap:24px; margin:12px 0 36px;}
