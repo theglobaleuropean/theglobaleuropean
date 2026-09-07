@@ -70,14 +70,17 @@
   <div class="wrap newsletter-inner">
     <div>
       <h2>The morning brief, from Brussels to your inbox</h2>
-      <p>One dispatch a day. Politics, economy and the long view on Europe's future — no noise.</p>
+      <p>Every new dispatch — politics, economy and the long view on Europe's future — sent straight to your inbox.</p>
     </div>
     <div class="newsletter-form-wrap">
-      <form class="newsletter-form" novalidate onsubmit="return handleNewsletterSubmit(event)">
-        <input type="email" id="newsletterEmail" placeholder="you@email.com" required>
+      <form class="newsletter-form" novalidate onsubmit="return handleNewsletterSubmit(event)" method="POST" target="brevo-subscribe-frame" action="https://e69d258b.sibforms.com/serve/MUIFAGszVtbTvrzZC-oNaQHtCQ_IO93vbjr8Y7PgHYIR8G67Nl2P5gANMYQuvj5hNkmUY7NML5m-RtOmave3ne0AHWcyBHz_s3xa2DHYop1b41Ja7CtwnOp9fAuo9qm2Q8zBQOjanP4oaD999uJVE9_OTRo5n0AsVPA9zDrzqIqBOm7wWQZ6GYiSJJxN-cTo91BE3k7NaE7jgsX29g==">
+        <input type="email" id="newsletterEmail" name="EMAIL" placeholder="you@email.com" required>
+        <input type="text" name="email_address_check" value="" style="position:absolute; left:-5000px;" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="locale" value="en">
         <button type="submit">Subscribe</button>
       </form>
-      <p class="newsletter-hint">Subscriptions are handled via our <a href="https://theglobaleuropean.substack.com" target="_blank" rel="noopener noreferrer">Substack</a>.</p>
+      <iframe name="brevo-subscribe-frame" style="display:none" title="Newsletter subscription"></iframe>
+      <p class="newsletter-hint">We'll never share your email. Unsubscribe anytime.</p>
       <p class="newsletter-error" id="newsletterError"></p>
     </div>
   </div>
@@ -137,22 +140,20 @@
   document.getElementById('logoFooter').innerHTML = LOGO_MARK_HTML;
 
   function handleNewsletterSubmit(e){
-    e.preventDefault();
     const form = e.target;
     const input = document.getElementById('newsletterEmail');
     const errorEl = document.getElementById('newsletterError');
     if(!input.checkValidity()){
+      e.preventDefault();
       errorEl.textContent = input.value.trim() ? 'Please enter a valid email address.' : 'Please enter your email address.';
       errorEl.classList.add('show');
       input.focus();
       return false;
     }
     errorEl.classList.remove('show');
-    const email = encodeURIComponent(input.value.trim());
-    window.open(`https://theglobaleuropean.substack.com/subscribe?email=${email}`, '_blank', 'noopener,noreferrer');
-    form.querySelector('button').textContent = 'Check Substack →';
+    form.querySelector('button').textContent = 'Check your inbox →';
     input.disabled = true;
-    return false;
+    return true;
   }
 
   function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
