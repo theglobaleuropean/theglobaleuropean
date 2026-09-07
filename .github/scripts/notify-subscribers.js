@@ -4,7 +4,7 @@ const path = require('path');
 const SITE_URL = process.env.SITE_URL || 'https://theglobaleuropean.eu';
 const API_KEY = process.env.BREVO_API_KEY;
 const LIST_ID = Number(process.env.BREVO_LIST_ID);
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'theglobaleuropean@gmail.com';
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'hello@theglobaleuropean.eu';
 const SENDER_NAME = 'The Global European';
 
 const STATE_FILE = path.join('.github', 'state', 'notified-articles.json');
