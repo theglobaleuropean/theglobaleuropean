@@ -104,6 +104,7 @@
 
   /* Article view */
   .wrap-article{max-width:1040px; margin:0 auto; padding:0 28px; display:grid; grid-template-columns:1fr 220px; gap:56px; align-items:start;}
+  .article-content{min-width:0;}
   .wrap-article.no-toc{grid-template-columns:1fr;}
   .wrap-article.no-toc .article-toc{display:none;}
   .article-eyebrow{margin-top:40px;}
