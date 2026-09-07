@@ -1,0 +1,35 @@
+name: Notify subscribers of new articles
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'articles.js'
+
+permissions:
+  contents: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Send campaign for any new articles
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ vars.BREVO_LIST_ID }}
+          SITE_URL: https://theglobaleuropean.eu
+        run: node .github/scripts/notify-subscribers.js
+
+      - name: Save notification state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/state/notified-articles.json
+          git diff --staged --quiet || git commit -m "Update notified-articles state [skip ci]"
+          git push
