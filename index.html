@@ -75,7 +75,7 @@
     <div class="newsletter-form-wrap">
       <form class="newsletter-form" novalidate onsubmit="return handleNewsletterSubmit(event)" method="POST" target="brevo-subscribe-frame" action="https://e69d258b.sibforms.com/serve/MUIFAGszVtbTvrzZC-oNaQHtCQ_IO93vbjr8Y7PgHYIR8G67Nl2P5gANMYQuvj5hNkmUY7NML5m-RtOmave3ne0AHWcyBHz_s3xa2DHYop1b41Ja7CtwnOp9fAuo9qm2Q8zBQOjanP4oaD999uJVE9_OTRo5n0AsVPA9zDrzqIqBOm7wWQZ6GYiSJJxN-cTo91BE3k7NaE7jgsX29g==?isAjax=1">
         <input type="email" id="newsletterEmail" name="EMAIL" placeholder="you@email.com" required>
-        <input type="text" name="email_address_check" value="" style="position:absolute; left:-5000px;" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="text" name="email_address_check" id="newsletterHoneypot" value="" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
         <input type="hidden" name="locale" value="en">
         <button type="submit">Subscribe</button>
       </form>
@@ -151,6 +151,8 @@
       return false;
     }
     errorEl.classList.remove('show');
+    const honeypot = document.getElementById('newsletterHoneypot');
+    if(honeypot) honeypot.value = '';
     form.querySelector('button').textContent = 'Check your inbox →';
     input.disabled = true;
     return true;
